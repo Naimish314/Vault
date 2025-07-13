@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  Image, TouchableOpacity, Alert, Linking, Modal
+  Image, TouchableOpacity, Alert, 
+  Linking, Modal, TextInput,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,11 +13,36 @@ export default function ProfileScreen({ navigation }){
   const [image, setImage] = useState(null);
   const [logoutVisible, setLogoutVisible] = useState(false);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [name, setName] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
+  const [email, setEmail] = useState('');
+
+   // Editable values (when modal opens)
+  const [editedName, setEditedName] = useState(name);
+  const [editedAccountNumber, setEditedAccountNumber] = useState(accountNumber);
+  const [editedEmail, setEditedEmail] = useState(email);
+
+
   useEffect(() => {
     (async () => {
       try {
         const storedUri = await AsyncStorage.getItem('@profile_image');
         if (storedUri) setImage(storedUri);
+
+        const storedName = await AsyncStorage.getItem('@profile_name');
+        const storedAccount = await AsyncStorage.getItem('@profile_account');
+        const storedEmail = await AsyncStorage.getItem('@profile_email');
+        
+        if (storedName) setName(storedName);
+        else setName('Your Name'); // Default name if not set
+
+        if (storedAccount) setAccountNumber(storedAccount);
+        else setAccountNumber('1234567890'); // Default account number if not set
+        
+        if (storedEmail) setEmail(storedEmail);
+        else setEmail('your@example.com'); // Default email if not set
+
 
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
@@ -49,26 +75,6 @@ export default function ProfileScreen({ navigation }){
     }
   };
 
-  const handleLogout = () => {
-  Alert.alert(
-    'Leaving the Vault?',
-  'Your saved data is safe.\nAre you sure you want to log out?',
-    [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Yes, Log Out',
-        style: 'destructive',
-        onPress: () => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Welcome' }],
-          });
-        },
-      },
-    ]
-  );
-};
-
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -85,9 +91,23 @@ export default function ProfileScreen({ navigation }){
             </View>
           </TouchableOpacity>
           <View style={styles.profileDetails}>
-            <Text style={styles.name}>Aaliya Mubashira</Text>
-            <Text style={styles.info}>Account No: 1234567890</Text>
-            <Text style={styles.info}>aaliya@example.com</Text>
+
+           <TouchableOpacity 
+            onPress={() => {
+            setEditedName(name);
+            setEditedAccountNumber(accountNumber);
+            setEditedEmail(email);
+            setModalVisible(true);
+             }}
+             >
+
+                <Feather name="edit-3" size={18} color="#C7B3FF" style={{ marginTop: 6 }} />
+           </TouchableOpacity>
+            
+           <Text style={styles.name}>{name}</Text>
+           <Text style={styles.info}>Account No: {accountNumber}</Text>
+           <Text style={styles.info}>{email}</Text>
+
           </View>
         </View>
 
@@ -145,7 +165,7 @@ export default function ProfileScreen({ navigation }){
                   <TouchableOpacity
                   style={styles.modalButtonConfirm} 
                   onPress={async () => {
-                    await AsyncStorage.removeItem('@profile_image');
+                    await AsyncStorage.removeItem('@user_token');
                     setLogoutVisible(false);
                     navigation.navigate('Welcome');
                   }}
@@ -156,6 +176,67 @@ export default function ProfileScreen({ navigation }){
               </View>
             </View>
         </Modal>
+
+        <Modal
+         animationType="fade"
+         transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Edit Profile</Text>
+                <TextInput
+                style={styles.input}
+                placeholder="Full Name"
+                placeholderTextColor="#AAA"
+                value={editedName}
+                onChangeText={setEditedName}
+                />
+                <TextInput
+                style={styles.input}
+                placeholder="Account Number"
+                placeholderTextColor="#AAA"
+                value={editedAccountNumber}
+                onChangeText={setEditedAccountNumber}
+                keyboardType="numeric"
+                /> 
+                <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#AAA"
+                value={editedEmail}
+                onChangeText={setEditedEmail}
+                keyboardType="email-address"
+                />
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                 onPress={() => setModalVisible(false)}
+                 style={styles.cancelBtn}
+                >
+                  <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+              <TouchableOpacity
+               onPress={async () => {
+                setName(editedName);
+                setAccountNumber(editedAccountNumber);
+                setEmail(editedEmail);
+                // Persist the new values
+                await AsyncStorage.setItem('@profile_name', editedName);
+                await AsyncStorage.setItem('@profile_account', editedAccountNumber);
+                await AsyncStorage.setItem('@profile_email', editedEmail);
+                setModalVisible(false);
+               }}
+               style={styles.saveBtn}
+               >
+                 <Text style={styles.saveText}>Save</Text>
+              </TouchableOpacity>
+
+             </View>
+            </View>
+          </View>
+        </Modal>
+
 
 
       </ScrollView>
@@ -306,5 +387,56 @@ modalButtonText: {
   color: '#FFF',
   fontWeight: '600',
 },
+modalOverlay: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+},
+modalContainer: {
+  width: '85%',
+  backgroundColor: '#1A1A1A',
+  borderRadius: 16,
+  padding: 20,
+},
+modalTitle: {
+  fontSize: 18,
+  fontWeight: '700',
+  color: '#E4D9FF',
+  marginBottom: 16,
+},
+input: {
+  backgroundColor: '#2A2A2A',
+  borderRadius: 10,
+  padding: 12,
+  marginBottom: 12,
+  color: '#E4D9FF',
+},
+modalButtonContainer: {
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  marginTop: 10,
+},
+cancelBtn: {
+  marginRight: 12,
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  backgroundColor: '#333',
+  borderRadius: 10,
+},
+cancelText: {
+  color: '#AAA',
+},
+saveBtn: {
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  backgroundColor: '#7A58C1',
+  borderRadius: 10,
+},
+saveText: {
+  color: '#FFF',
+  fontWeight: '600',
+},
+
 
 });
