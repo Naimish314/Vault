@@ -11,6 +11,11 @@ import SignupScreen from '../screens/SignupScreen';
 import GroupsScreen from '../screens/GroupsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SavingsScreen from '../screens/SavingsScreen';
+import FAQsScreen from '../screens/FAQsScreen';
+import DosDontsScreen from '../screens/DosDontsScreen';
+import PrivacySettingsScreen from '../screens/PrivacySettingsScreen';
+import TermsPoliciesScreen from '../screens/TermsPoliciesScreen';
+import AlertSettingsScreen from '../screens/AlertSettingsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +30,11 @@ export default function AppNavigator() {
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Groups" component={GroupsScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="FAQs" component={FAQsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="DosDonts" component={DosDontsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="TermsPolicies" component={TermsPoliciesScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="AlertSettings" component={AlertSettingsScreen} options={{ headerShown: false }}/>
         <Stack.Screen name="Savings" component={SavingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

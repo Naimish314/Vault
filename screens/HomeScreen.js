@@ -26,15 +26,15 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.bottomBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Groups')}>
-          <Ionicons name="people-outline" size={wp('7%')} color="#D4C2FF" />
+          <Ionicons name="people-outline" size={wp('8.5%')} color="#D4C2FF" />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('Savings')}>
-          <MaterialIcons name="savings" size={wp('7%')} color="#D4C2FF" />
+          <MaterialIcons name="savings" size={wp('8.5%')} color="#D4C2FF" />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          <Feather name="user" size={wp('6.5%')} color="#D4C2FF" />
+          <Feather name="user" size={wp('8.5%')} color="#D4C2FF" />
         </TouchableOpacity>
       </View>
     </View>

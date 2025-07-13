@@ -7,7 +7,10 @@ import {
   FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const mockGroups = [
@@ -19,44 +22,48 @@ const mockGroups = [
 export default function GroupsScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safeArea}>
-    <View style={styles.container}>
-      {/* Top header */}
-      <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back-outline" size={wp('7%')} color="#D4C2FF" />
-        </TouchableOpacity>
-        <Text style={styles.header}>In Groups</Text>
-        <Ionicons name="lock-closed-outline" size={wp('6%')} color="#D4C2FF" />
-      </View>
+      <View style={styles.container}>
+        {/* Top header */}
+        <View style={styles.headerContainer}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back-outline" size={wp('7%')} color="#D4C2FF" />
+          </TouchableOpacity>
+          <Text style={styles.header}>In Groups</Text>
+          <Ionicons name="lock-closed-outline" size={wp('6%')} color="#D4C2FF" />
+        </View>
 
-      {/* Group List */}
-      <FlatList
-        data={mockGroups}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.groupCard}>
-            <View style={styles.groupLeft}>
-              <Text style={styles.groupName}>{item.name}</Text>
-              <Text style={styles.membersText}>members: {item.members}</Text>
+        {/* Group List */}
+        <FlatList
+          data={mockGroups}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.groupCard}>
+              <View style={styles.groupLeft}>
+                <Text style={styles.groupName}>{item.name}</Text>
+                <Text style={styles.membersText}>members: {item.members}</Text>
+              </View>
+              <View style={styles.amountBox}>
+                <Text style={styles.amountText}>₹{item.total}</Text>
+              </View>
             </View>
-            <View style={styles.amountBox}>
-              <Text style={styles.amountText}>₹{item.total}</Text>
-            </View>
-          </View>
-        )}
-        contentContainerStyle={{ paddingBottom: hp('3%') }}
-      />
-    </View>
+          )}
+          contentContainerStyle={{ paddingBottom: hp('3%') }}
+          style={{ flexGrow: 1 }}
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#0A0A0A',
+  },
+  container: {
+    flex: 1,
     padding: wp('5%'),
-    paddingTop: hp('6%'),
+    paddingTop: hp('2%'),
   },
   headerContainer: {
     flexDirection: 'row',
