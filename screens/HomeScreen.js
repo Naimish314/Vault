@@ -69,14 +69,16 @@ export default function HomeScreen({ navigation }) {
         showsHorizontalScrollIndicator={false}
         renderItem={({ item, index }) => (
           <TouchableOpacity
-            style={[
-              styles.vaultCard,
-              { backgroundColor: vaultColors[index % vaultColors.length] }
-            ]}
+          style={[
+            styles.vaultCard,
+            { backgroundColor: vaultColors[index % vaultColors.length] }
+          ]}
+          onPress={() => navigation.navigate('VaultDetails', { vaultId: item.id })}
           >
             <Text style={styles.vaultTitle}>{item.title}</Text>
             <Text style={styles.vaultAmount}>{item.amount}</Text>
           </TouchableOpacity>
+
         )}
       />
 

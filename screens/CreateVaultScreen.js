@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, TextInput,
-  TouchableOpacity, Modal, FlatList
+  View, Text, StyleSheet, TextInput, TouchableOpacity,
+  Modal, FlatList, ScrollView
 } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -12,6 +13,11 @@ export default function CreateVaultScreen() {
   const navigation = useNavigation();
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
+  const [numMembers, setNumMembers] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [showStartCalendar, setShowStartCalendar] = useState(false);
+  const [showEndCalendar, setShowEndCalendar] = useState(false);
   const [memberInput, setMemberInput] = useState('');
   const [members, setMembers] = useState([]);
   const [successModalVisible, setSuccessModalVisible] = useState(false);
@@ -23,9 +29,25 @@ export default function CreateVaultScreen() {
     }
   };
 
+  const calculateMonthlyContribution = () => {
+    const amt = parseFloat(amount);
+    const membersCount = parseInt(numMembers);
+    if (!amt || !membersCount || !startDate || !endDate) return 0;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const months = Math.max(
+      1,
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth())
+    );
+    return (amt / membersCount / months).toFixed(2);
+  };
+
   const saveVault = async () => {
-    if (!title.trim() || !amount.trim()) {
-      setSuccessModalVisible(true); // use modal instead of alert
+    if (!title.trim() || !amount.trim() || !numMembers.trim() || !startDate || !endDate) {
+      setSuccessModalVisible(true);
       return;
     }
 
@@ -34,15 +56,19 @@ export default function CreateVaultScreen() {
         id: Date.now().toString(),
         title,
         amount: `₹${parseInt(amount)}`,
+        numMembers,
+        startDate,
+        endDate,
         members,
+        monthlyContribution: `₹${calculateMonthlyContribution()}`,
+        dueDay: new Date(startDate).getDate(),
       };
 
       const storedVaults = await AsyncStorage.getItem('vaults');
       const parsedVaults = storedVaults ? JSON.parse(storedVaults) : [];
-
       parsedVaults.push(newVault);
-      await AsyncStorage.setItem('vaults', JSON.stringify(parsedVaults));
 
+      await AsyncStorage.setItem('vaults', JSON.stringify(parsedVaults));
       setSuccessModalVisible(true);
     } catch (err) {
       console.log('Error saving vault:', err);
@@ -50,7 +76,7 @@ export default function CreateVaultScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>Create a New Vault</Text>
 
       <TextInput
@@ -63,13 +89,53 @@ export default function CreateVaultScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder="Amount"
+        placeholder="Total Amount"
         placeholderTextColor="#AAA"
         value={amount}
         onChangeText={setAmount}
         keyboardType="numeric"
       />
 
+      <TextInput
+        style={styles.input}
+        placeholder="Number of Members"
+        placeholderTextColor="#AAA"
+        value={numMembers}
+        onChangeText={setNumMembers}
+        keyboardType="numeric"
+      />
+
+      {/* Start Date Selector */}
+      <TouchableOpacity onPress={() => setShowStartCalendar(!showStartCalendar)} style={styles.input}>
+        <Text style={{ color: '#E4D9FF' }}>{startDate ? `Start Date: ${startDate}` : 'Select Start Date'}</Text>
+      </TouchableOpacity>
+      {showStartCalendar && (
+        <Calendar
+          onDayPress={day => {
+            setStartDate(day.dateString);
+            setShowStartCalendar(false);
+          }}
+          theme={calendarTheme}
+          markedDates={{ [startDate]: { selected: true, selectedColor: '#7A58C1' } }}
+        />
+      )}
+
+      {/* End Date Selector */}
+      <TouchableOpacity onPress={() => setShowEndCalendar(!showEndCalendar)} style={styles.input}>
+        <Text style={{ color: '#E4D9FF' }}>{endDate ? `End Date: ${endDate}` : 'Select End Date'}</Text>
+      </TouchableOpacity>
+      {showEndCalendar && (
+        <Calendar
+          onDayPress={day => {
+            setEndDate(day.dateString);
+            setShowEndCalendar(false);
+          }}
+          theme={calendarTheme}
+          markedDates={{ [endDate]: { selected: true, selectedColor: '#AD99FF' } }}
+        />
+      )}
+
+      {/* Add Members */}
       <View style={styles.memberSection}>
         <Text style={styles.subHeader}>Add Members</Text>
 
@@ -86,21 +152,17 @@ export default function CreateVaultScreen() {
           </TouchableOpacity>
         </View>
 
-        <FlatList
-          data={members}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <Text style={styles.memberText}>• {item}</Text>
-          )}
-          style={{ marginTop: 10 }}
-        />
+        {members.map((item, index) => (
+            <Text key={index} style={styles.memberText}>• {item}</Text>
+            ))}
+
       </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={saveVault}>
         <Text style={styles.saveText}>Save Vault</Text>
       </TouchableOpacity>
 
-      {/* Themed Success Modal */}
+      {/* Themed Modal */}
       <Modal
         animationType="fade"
         transparent
@@ -110,19 +172,19 @@ export default function CreateVaultScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>
-              {title && amount ? 'Vault Created 🎉' : 'Missing Details'}
+              {title && amount && numMembers && startDate && endDate ? 'Vault Created 🎉' : 'Missing Details'}
             </Text>
             <Text style={styles.modalMessage}>
-              {title && amount
-                ? 'Your vault was successfully created!'
-                : 'Please fill in both title and amount.'}
+              {title && amount && numMembers && startDate && endDate
+                ? `Each member pays ₹${calculateMonthlyContribution()} monthly`
+                : 'Please fill in all required fields.'}
             </Text>
 
             <TouchableOpacity
               style={styles.modalButton}
               onPress={() => {
                 setSuccessModalVisible(false);
-                if (title && amount) navigation.navigate('Home');
+                if (title && amount && numMembers && startDate && endDate) navigation.navigate('Home');
               }}
             >
               <Text style={styles.modalButtonText}>OK</Text>
@@ -130,16 +192,33 @@ export default function CreateVaultScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ScrollView>
   );
 }
+
+const calendarTheme = {
+  backgroundColor: '#0A0A0A',
+  calendarBackground: '#0A0A0A',
+  textSectionTitleColor: '#AD99FF',
+  selectedDayBackgroundColor: '#7A58C1',
+  selectedDayTextColor: '#FFFFFF',
+  todayTextColor: '#AD99FF',
+  dayTextColor: '#E4D9FF',
+  textDisabledColor: '#555',
+  dotColor: '#7A58C1',
+  arrowColor: '#AD99FF',
+  monthTextColor: '#E4D9FF',
+  textDayFontWeight: '500',
+  textMonthFontWeight: '700',
+  textDayHeaderFontWeight: '600',
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0A0A0A',
     padding: wp('6%'),
-    paddingTop: hp('7%'),
+    paddingTop: hp('6%'),
   },
   header: {
     fontSize: wp('6.5%'),
@@ -162,7 +241,7 @@ const styles = StyleSheet.create({
     fontSize: wp('4.5%'),
     borderColor: '#7A58C1',
     borderWidth: 1,
-    marginBottom: hp('2.5%'),
+    marginBottom: hp('2.2%'),
   },
   saveButton: {
     backgroundColor: '#7A58C1',
@@ -170,20 +249,15 @@ const styles = StyleSheet.create({
     borderRadius: wp('5%'),
     alignItems: 'center',
     marginTop: hp('3%'),
+    marginBottom: hp('6%'),
   },
   saveText: {
     color: '#FFF',
     fontSize: wp('4.5%'),
     fontWeight: '600',
   },
-  memberSection: {
-    marginTop: hp('2%'),
-  },
-  memberInputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: wp('3%'),
-  },
+  memberSection: { marginTop: hp('2%') },
+  memberInputRow: { flexDirection: 'row', alignItems: 'center', gap: wp('3%') },
   addBtn: {
     backgroundColor: '#7A58C1',
     padding: wp('3.2%'),
@@ -191,16 +265,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  memberText: {
-    color: '#AD99FF',
-    fontSize: wp('4%'),
-    marginVertical: hp('0.3%'),
-  },
+  memberText: { color: '#AD99FF', fontSize: wp('4%'), marginVertical: hp('0.3%') },
   modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center', alignItems: 'center',
   },
   modalContainer: {
     backgroundColor: '#1A1A1A',
@@ -211,17 +279,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
   },
-  modalTitle: {
-    fontSize: wp('5.5%'),
-    fontWeight: '700',
-    color: '#E4D9FF',
-    marginBottom: hp('1%'),
-  },
+  modalTitle: { fontSize: wp('5.5%'), fontWeight: '700', color: '#E4D9FF', marginBottom: hp('1%') },
   modalMessage: {
-    color: '#AAA',
-    fontSize: wp('4%'),
-    textAlign: 'center',
-    marginBottom: hp('2.5%'),
+    color: '#AAA', fontSize: wp('4%'),
+    textAlign: 'center', marginBottom: hp('2.5%')
   },
   modalButton: {
     backgroundColor: '#7A58C1',
@@ -229,9 +290,5 @@ const styles = StyleSheet.create({
     paddingVertical: hp('1.2%'),
     paddingHorizontal: wp('10%'),
   },
-  modalButtonText: {
-    color: '#FFF',
-    fontWeight: '600',
-    fontSize: wp('4%'),
-  },
+  modalButtonText: { color: '#FFF', fontWeight: '600', fontSize: wp('4%') },
 });
