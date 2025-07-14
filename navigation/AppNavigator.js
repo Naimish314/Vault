@@ -16,7 +16,7 @@ import DosDontsScreen from '../screens/DosDontsScreen';
 import PrivacySettingsScreen from '../screens/PrivacySettingsScreen';
 import TermsPoliciesScreen from '../screens/TermsPoliciesScreen';
 import AlertSettingsScreen from '../screens/AlertSettingsScreen';
-
+import CreateVaultScreen from '../screens/CreateVaultScreen';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -26,6 +26,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="CreateVault" component={CreateVaultScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Groups" component={GroupsScreen} />
