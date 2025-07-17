@@ -43,5 +43,8 @@ Vault is a mobile-first React Native app built with Expo that empowers trusted f
 - ProfileScreen ✅
 
 ---
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
 
 
