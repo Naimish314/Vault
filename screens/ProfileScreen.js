@@ -59,7 +59,7 @@ export default function ProfileScreen({ navigation }){
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images, // ✅ Fixed line
+        mediaTypes: ImagePicker.MediaType.IMAGE,
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.7,
