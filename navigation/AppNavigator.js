@@ -3,6 +3,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+
 import WelcomeScreen from '../screens/WelcomeScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -24,6 +25,7 @@ const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
+   
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
@@ -44,5 +46,6 @@ export default function AppNavigator() {
         <Stack.Screen name="Savings" component={SavingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
+   
   );
 }
