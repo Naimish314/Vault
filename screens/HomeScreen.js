@@ -12,11 +12,6 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const vaultColors = ['#7A58C1', '#AD99FF', '#5A3C9A'];
 
-const mockUser = {
-  name: 'Priya',
-  avatar: 'https://randomuser.me/api/portraits/women/44.jpg'
-};
-
 const mockActivities = [
   { id: '1', text: 'You deposited ₹500 in Travel Vault', time: '2h ago' },
   { id: '2', text: 'Amit joined Family Vault', time: '5h ago' },
@@ -27,6 +22,10 @@ export default function HomeScreen({ navigation }) {
   const [activeVaults, setActiveVaults] = useState([]);
   const [notifications, setNotifications] = useState(2);
   const [filter, setFilter] = useState('all');
+  const [profile, setProfile] = useState({
+    name: 'User',
+    avatar: 'https://www.gravatar.com/avatar/?d=mp'
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -39,11 +38,25 @@ export default function HomeScreen({ navigation }) {
           console.error('Error loading vaults:', error);
         }
       };
+
+      const loadProfile = async () => {
+        try {
+          const storedName = await AsyncStorage.getItem('@profile_name');
+          const storedImage = await AsyncStorage.getItem('@profile_image');
+          setProfile({
+            name: storedName || 'User',
+            avatar: storedImage || 'https://www.gravatar.com/avatar/?d=mp'
+          });
+        } catch (err) {
+          console.error('Failed to load profile:', err);
+        }
+      };
+
       loadVaults();
+      loadProfile();
     }, [])
   );
 
-  // Filter vaults (example: by amount)
   const filteredVaults = filter === 'all'
     ? activeVaults
     : activeVaults.filter(v => v.amount > 5000);
@@ -53,10 +66,13 @@ export default function HomeScreen({ navigation }) {
       {/* Fixed Top Bar */}
       <View style={styles.topBarFixed}>
         <View style={styles.greetingContainer}>
-          <Image source={{ uri: mockUser.avatar }} style={styles.avatar} />
-          <Text style={styles.greetingText}>Hi, {mockUser.name} 👋</Text>
+          <Image source={{ uri: profile.avatar }} style={styles.avatar} />
+          <Text style={styles.greetingText}>Hi, {profile.name} 👋</Text>
         </View>
-        <TouchableOpacity style={styles.notificationIcon}>
+        <TouchableOpacity
+          style={styles.notificationIcon}
+          onPress={() => navigation.navigate('Notifications')}
+        >
           <Ionicons name="notifications-outline" size={wp('7%')} color="#E4D9FF" />
           {notifications > 0 && (
             <View style={styles.badge}>
@@ -65,6 +81,7 @@ export default function HomeScreen({ navigation }) {
           )}
         </TouchableOpacity>
       </View>
+
       {/* Scrollable Content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -101,7 +118,7 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Action Buttons */}
+        {/* Vault Management */}
         <View style={styles.mainButtons}>
           <TouchableOpacity
             style={styles.actionButton}
@@ -120,26 +137,20 @@ export default function HomeScreen({ navigation }) {
         {/* Vault Filter */}
         <View style={styles.filterBar}>
           <TouchableOpacity
-            style={[
-              styles.filterBtn,
-              filter === 'all' && styles.filterBtnActive
-            ]}
+            style={[styles.filterBtn, filter === 'all' && styles.filterBtnActive]}
             onPress={() => setFilter('all')}
           >
             <Text style={styles.filterText}>All</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.filterBtn,
-              filter === 'high' && styles.filterBtnActive
-            ]}
+            style={[styles.filterBtn, filter === 'high' && styles.filterBtnActive]}
             onPress={() => setFilter('high')}
           >
             <Text style={styles.filterText}>High Value</Text>
           </TouchableOpacity>
         </View>
 
-        {/* My Active Vaults */}
+        {/* Vault List */}
         <Text style={styles.vaultStripHeader}>My Active Vaults</Text>
         <FlatList
           horizontal
@@ -156,8 +167,7 @@ export default function HomeScreen({ navigation }) {
               onPress={() => navigation.navigate('VaultDetails', { vaultId: item.id })}
             >
               <Text style={styles.vaultTitle}>{item.title}</Text>
-              <Text style={styles.vaultAmount}>₹{item.amount}</Text>
-              {/* Progress Bar */}
+              <Text style={styles.vaultAmount}>{item.amount}</Text>
               <View style={styles.progressBarBg}>
                 <View style={[
                   styles.progressBarFill,
@@ -171,7 +181,7 @@ export default function HomeScreen({ navigation }) {
           )}
         />
 
-        {/* Recent Activity Feed */}
+        {/* Activity Feed */}
         <Text style={styles.activityHeader}>Recent Activity</Text>
         <View style={styles.activityFeed}>
           {mockActivities.map(activity => (
@@ -183,7 +193,7 @@ export default function HomeScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation Bar */}
+      {/* Bottom Navigation */}
       <View style={styles.bottomBar}>
         <TouchableOpacity onPress={() => navigation.navigate('Groups')}>
           <Ionicons name="people-outline" size={wp('8%')} color="#D4C2FF" />
@@ -198,6 +208,8 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

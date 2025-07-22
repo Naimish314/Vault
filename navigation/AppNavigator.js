@@ -20,7 +20,7 @@ import AlertSettingsScreen from '../screens/AlertSettingsScreen';
 import CreateVaultScreen from '../screens/CreateVaultScreen';
 import VaultDetailsScreen from '../screens/VaultDetailsScreen';
 import JoinVaultScreen from '../screens/JoinVaultScreen';
-
+import NotificationsScreen from '../screens/NotificationsScreen';   
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -43,6 +43,7 @@ export default function AppNavigator() {
         <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="TermsPolicies" component={TermsPoliciesScreen} options={{ headerShown: false }} />
         <Stack.Screen name="AlertSettings" component={AlertSettingsScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Savings" component={SavingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
