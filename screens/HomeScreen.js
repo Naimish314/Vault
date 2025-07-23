@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, FlatList, Image, ScrollView
+  View, Text, StyleSheet, TouchableOpacity, FlatList, ImageBackground, Image, ScrollView
 } from 'react-native';
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import {
@@ -11,6 +11,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 const vaultColors = ['#7A58C1', '#AD99FF', '#5A3C9A'];
+
+const vaultBackgrounds = {
+  trip: require('../assets/bg_travel.avif'),
+  family: require('../assets/bg_family.jpg'),
+  party: require('../assets/bg_party.jpg'),
+  default: require('../assets/bg_default.jpg'),
+};
+
 
 const mockActivities = [
   { id: '1', text: 'You deposited ₹500 in Travel Vault', time: '2h ago' },
@@ -60,6 +68,16 @@ export default function HomeScreen({ navigation }) {
   const filteredVaults = filter === 'all'
     ? activeVaults
     : activeVaults.filter(v => v.amount > 5000);
+
+
+const getVaultBackground = (title) => {
+  const key = title?.toLowerCase();
+  if (key.includes('trip')) return vaultBackgrounds.trip;
+  if (key.includes('family')) return vaultBackgrounds.family;
+  if (key.includes('party')) return vaultBackgrounds.party;
+  return vaultBackgrounds.default;
+};
+
 
   return (
     <View style={styles.container}>
@@ -161,22 +179,19 @@ export default function HomeScreen({ navigation }) {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               style={[
-                styles.vaultCard,
-                { backgroundColor: vaultColors[index % vaultColors.length] }
-              ]}
+                styles.vaultCardWrapper]}
               onPress={() => navigation.navigate('VaultDetails', { vaultId: item.id })}
             >
+              <ImageBackground
+               source={getVaultBackground(item.title)}
+               style={styles.vaultCard}
+                imageStyle={{ borderRadius: wp('4%') }}
+                >
               <Text style={styles.vaultTitle}>{item.title}</Text>
               <Text style={styles.vaultAmount}>{item.amount}</Text>
-              <View style={styles.progressBarBg}>
-                <View style={[
-                  styles.progressBarFill,
-                  { width: `${Math.min(100, (item.amount / (item.goal || 10000)) * 100)}%` }
-                ]} />
-              </View>
-              <Text style={styles.goalText}>
-                {item.goal ? `Goal: ₹${item.goal}` : 'No goal set'}
-              </Text>
+              
+             
+              </ImageBackground>
             </TouchableOpacity>
           )}
         />
@@ -436,4 +451,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  vaultCardWrapper: {
+  marginRight: wp('3.5%'),
+  width: wp('40%'),
+  height: hp('15%'),
+  },
+  vaultCard: {
+  width: '100%',
+  height: '100%',
+  resizeMode: 'cover',
+  justifyContent: 'center',
+  padding: wp('3.5%'),
+  },
+
 }); 
