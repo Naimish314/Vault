@@ -75,7 +75,7 @@ export default function ProfileScreen({ navigation }){
   const pickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaType.IMAGE,
+        mediaTypes:ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.7,
@@ -99,7 +99,7 @@ export default function ProfileScreen({ navigation }){
         <View style={styles.profileContainer}>
           <TouchableOpacity style={styles.profileImageWrapper} onPress={pickImage}>
             <Image
-              source={image ? { uri: image } : require('../assets/icon.png')}
+              source={image ? { uri: image } : require('../assets/icon1.png')}
               style={styles.profileImage}
             />
             <View style={styles.editIconWrapper}>

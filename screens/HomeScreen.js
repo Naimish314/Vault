@@ -108,7 +108,7 @@ const getVaultBackground = (title) => {
         {/* Summary Card */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryText}>Total Vaults Joined: {activeVaults.length}</Text>
-          <Text style={styles.summarySubText}>Total Savings: ₹12,500</Text>
+          <Text style={styles.summarySubText}>The Goals will be Achieved, {profile.name}! </Text>
         </View>
 
         {/* Quick Actions */}

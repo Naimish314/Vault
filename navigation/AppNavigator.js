@@ -21,6 +21,7 @@ import AlertSettingsScreen from '../screens/AlertSettingsScreen';
 import CreateVaultScreen from '../screens/CreateVaultScreen';
 import VaultDetailsScreen from '../screens/VaultDetailsScreen';
 import JoinVaultScreen from '../screens/JoinVaultScreen';
+import DepositScreen from '../screens/DepositScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';   
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="CreateVault" component={CreateVaultScreen} />
         <Stack.Screen name="JoinVault" component={JoinVaultScreen} />
+        <Stack.Screen name="Deposit" component={DepositScreen} />
         <Stack.Screen name="VaultDetails" component={VaultDetailsScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
