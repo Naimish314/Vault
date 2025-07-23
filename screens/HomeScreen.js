@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.topBarFixed}>
         <View style={styles.greetingContainer}>
           <Image source={{ uri: profile.avatar }} style={styles.avatar} />
-          <Text style={styles.greetingText}>Hi, {profile.name} 👋</Text>
+          <Text style={styles.greetingText}>Hi, {profile.name} </Text>
         </View>
         <TouchableOpacity
           style={styles.notificationIcon}

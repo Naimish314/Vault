@@ -1,61 +1,67 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function SavingsScreen() {
-  const savingsGoals = [
-    {
-      title: 'Goa Trip Vault',
-      description: 'Saving for our October beach trip 🌴',
-      status: 'In Progress',
-      color: '#D4C2FF',
-    },
-    {
-      title: 'New Year Party',
-      description: 'Drinks, music & food! 🎉',
-      status: 'Completed',
-      color: '#9B7DFF',
-    },
-    {
-      title: 'Birthday Surprise Fund',
-      description: 'Pool in ₹500 each for her birthday 🎂',
-      status: 'New',
-      color: '#7A58C1',
-    },
-  ];
+export default function SavingsScreen({ route }) {
+  const [savingsGoals, setSavingsGoals] = useState([]);
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        // Try to get from navigation params first
+        if (route.params?.savingsGoals) {
+          setSavingsGoals(route.params.savingsGoals);
+        } else {
+          // Otherwise, get from AsyncStorage
+          const storedVaults = await AsyncStorage.getItem('vaults');
+          const parsedVaults = storedVaults ? JSON.parse(storedVaults) : [];
+          setSavingsGoals(parsedVaults);
+        }
+      } catch (err) {
+        setSavingsGoals([]);
+      }
+    };
+    fetchGoals();
+  }, [route.params]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
-    <ScrollView style={styles.container}>
-      <Text style={styles.header}>Savings Overview</Text>
+      <ScrollView style={styles.container}>
+        <Text style={styles.header}>Savings Overview</Text>
 
-      <View style={styles.statsBox}>
-        <Text style={styles.goalCount}>3 Vault Goals</Text>
-        <Text style={styles.subtext}>You're making progress 🚀</Text>
-        <View style={styles.progressRow}>
-          <Text style={styles.progressText}>New: 1</Text>
-          <Text style={styles.progressText}>In Progress: 1</Text>
-          <Text style={styles.progressText}>Completed: 1</Text>
-        </View>
-      </View>
-
-      {savingsGoals.map((goal, index) => (
-        <TouchableOpacity key={index} style={[styles.card, { borderLeftColor: goal.color }]}>
-          <View style={styles.cardText}>
-            <Text style={styles.cardTitle}>{goal.title}</Text>
-            <Text style={styles.cardDescription}>{goal.description}</Text>
-            <Text style={styles.cardStatus}>Status: {goal.status}</Text>
+        <View style={styles.statsBox}>
+          <Text style={styles.goalCount}>{savingsGoals.length} Vault Goals</Text>
+          <Text style={styles.subtext}>You're making progress 🚀</Text>
+          <View style={styles.progressRow}>
+            <Text style={styles.progressText}>
+              New: {savingsGoals.filter(g => g.status === 'New').length}
+            </Text>
+            <Text style={styles.progressText}>
+              In Progress: {savingsGoals.filter(g => g.status === 'In Progress').length}
+            </Text>
+            <Text style={styles.progressText}>
+              Completed: {savingsGoals.filter(g => g.status === 'Completed').length}
+            </Text>
           </View>
-          <MaterialIcons name="keyboard-arrow-right" size={wp('6%')} color="#aaa" />
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+        </View>
+
+        {savingsGoals.map((goal, index) => (
+          <TouchableOpacity key={index} style={[styles.card, { borderLeftColor: goal.color || '#7A58C1' }]}>
+            <View style={styles.cardText}>
+              <Text style={styles.cardTitle}>{goal.title}</Text>
+              <Text style={styles.cardDescription}>{goal.description}</Text>
+              <Text style={styles.cardStatus}>Status: {goal.status}</Text>
+            </View>
+            <MaterialIcons name="keyboard-arrow-right" size={wp('6%')} color="#aaa" />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   );
 }
-
 const styles = StyleSheet.create({
  safeArea: {
         flex: 1,

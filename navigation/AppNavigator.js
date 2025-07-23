@@ -11,6 +11,7 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import GroupsScreen from '../screens/GroupsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import ProfileEditScreen from '../screens/ProfileEditScreen';
 import SavingsScreen from '../screens/SavingsScreen';
 import FAQsScreen from '../screens/FAQsScreen';
 import DosDontsScreen from '../screens/DosDontsScreen';
@@ -38,6 +39,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Groups" component={GroupsScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
         <Stack.Screen name="FAQs" component={FAQsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="DosDonts" component={DosDontsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="PrivacySettings" component={PrivacySettingsScreen} options={{ headerShown: false }} />

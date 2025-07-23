@@ -23,6 +23,10 @@ export default function ProfileScreen({ navigation }){
   const [editedAccountNumber, setEditedAccountNumber] = useState(accountNumber);
   const [editedEmail, setEditedEmail] = useState(email);
 
+  const [bio, setBio] = useState('');
+  const [gender, setGender] = useState('');
+  const [birthday, setBirthday] = useState('');
+
 
   useEffect(() => {
     (async () => {
@@ -33,6 +37,9 @@ export default function ProfileScreen({ navigation }){
         const storedName = await AsyncStorage.getItem('@profile_name');
         const storedAccount = await AsyncStorage.getItem('@profile_account');
         const storedEmail = await AsyncStorage.getItem('@profile_email');
+        const storedBio = await AsyncStorage.getItem('@profile_bio');
+        const storedGender = await AsyncStorage.getItem('@profile_gender');
+        const storedBirthday = await AsyncStorage.getItem('@profile_birthday');
         
         if (storedName) setName(storedName);
         else setName('Your Name'); // Default name if not set
@@ -42,6 +49,15 @@ export default function ProfileScreen({ navigation }){
         
         if (storedEmail) setEmail(storedEmail);
         else setEmail('your@example.com'); // Default email if not set
+
+        if (storedBio) setBio(storedBio);
+        else setBio(''); // Default bio if not set
+
+        if (storedGender) setGender(storedGender);
+        else setGender(''); // Default gender if not set
+
+        if (storedBirthday) setBirthday(new Date(storedBirthday).toLocaleDateString());
+        else setBirthday(''); // Default birthday if not set
 
 
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -92,21 +108,26 @@ export default function ProfileScreen({ navigation }){
           </TouchableOpacity>
           <View style={styles.profileDetails}>
 
-           <TouchableOpacity 
-            onPress={() => {
-            setEditedName(name);
-            setEditedAccountNumber(accountNumber);
-            setEditedEmail(email);
-            setModalVisible(true);
-             }}
-             >
-
-                <Feather name="edit-3" size={18} color="#C7B3FF" style={{ marginTop: 6 }} />
-           </TouchableOpacity>
+          <TouchableOpacity 
+           onPress={() => {
+            navigation.navigate('ProfileEdit', {
+              name,
+              accountNumber,
+              email,
+              image,
+               // Add other fields if needed
+             });
+           }}
+           >
+            <Feather name="edit-3" size={18} color="#C7B3FF" style={{ marginTop: 6 }} />
+          </TouchableOpacity>
             
            <Text style={styles.name}>{name}</Text>
            <Text style={styles.info}>Account No: {accountNumber}</Text>
            <Text style={styles.info}>{email}</Text>
+           <Text style={styles.info}>Bio: {bio}</Text>
+           <Text style={styles.info}>Birthday: {birthday}</Text>
+           <Text style={styles.info}>Gender: {gender}</Text>
 
           </View>
         </View>
