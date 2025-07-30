@@ -10,6 +10,7 @@ import HomeScreen from '../screens/HomeScreen';
 import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import GroupsScreen from '../screens/GroupsScreen';
+import SubVaultsScreen from '../screens/SubVaultsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import ProfileEditScreen from '../screens/ProfileEditScreen';
 import SavingsScreen from '../screens/SavingsScreen';
@@ -20,6 +21,7 @@ import TermsPoliciesScreen from '../screens/TermsPoliciesScreen';
 import AlertSettingsScreen from '../screens/AlertSettingsScreen';
 import CreateVaultScreen from '../screens/CreateVaultScreen';
 import VaultDetailsScreen from '../screens/VaultDetailsScreen';
+import SubVaultsDetailScreen from '../screens/SubVaultsDetailScreen';
 import JoinVaultScreen from '../screens/JoinVaultScreen';
 import DepositScreen from '../screens/DepositScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';   
@@ -37,9 +39,11 @@ export default function AppNavigator() {
         <Stack.Screen name="JoinVault" component={JoinVaultScreen} />
         <Stack.Screen name="Deposit" component={DepositScreen} />
         <Stack.Screen name="VaultDetails" component={VaultDetailsScreen} />
+        <Stack.Screen name="SubVaultsDetail" component={SubVaultsDetailScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Groups" component={GroupsScreen} />
+        <Stack.Screen name="SubVault" component={SubVaultsScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} />
         <Stack.Screen name="FAQs" component={FAQsScreen} options={{ headerShown: false }} />

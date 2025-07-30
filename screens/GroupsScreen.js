@@ -19,7 +19,7 @@ useEffect(() => {
     const data = await AsyncStorage.getItem('vaults');
     if (data) {
       const allVaults = JSON.parse(data);
-      const completeVaults = allVaults.filter(v => v?.title && v?.amount && v?.startDate && v?.endDate);
+      const completeVaults = allVaults.filter(v => v?.title );
       setVaults(completeVaults);
     }
   };
@@ -48,63 +48,52 @@ useEffect(() => {
   };
 
 const renderVault = ({ item }) => {
-  if (!item?.amount || !item?.startDate || !item?.endDate) return null;
-
-  const currentDate = new Date();
-  const goalDate = new Date(item.endDate);
-  const totalMonths =
-    (goalDate.getFullYear() - new Date(item.startDate).getFullYear()) * 12 +
-    (goalDate.getMonth() - new Date(item.startDate).getMonth());
-
-  const rawAmount = item?.amount?.replace?.('₹', '') || '0';
-  const totalExpected = parseInt(rawAmount);
-
-  const contribution = parseFloat(item?.monthlyContribution?.replace?.('₹', '')) || 0;
-  const membersCount = parseInt(item.numMembers) || 1;
-  const monthsPassed =
-    (currentDate.getFullYear() - new Date(item.startDate).getFullYear()) * 12 +
-    (currentDate.getMonth() - new Date(item.startDate).getMonth());
-
-  const currentTotal = Math.min(contribution * monthsPassed * membersCount, totalExpected);
-  const progressPercent = Math.min((currentTotal / totalExpected) * 100, 100).toFixed(0);
-
   return (
-    <View style={styles.vaultCard}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('VaultDetails', { vaultId: item.id })}
+      activeOpacity={0.85}
+      style={styles.vaultCard}
+    >
       <Text style={styles.vaultTitle}>{item.title}</Text>
-      <Text style={styles.info}>Goal: {item.amount}</Text>
-      <Text style={styles.info}>Members: {item.members?.length || item.numMembers}</Text>
-      <Text style={styles.info}>
-        {`Start: ${new Date(item.startDate).toDateString()} → End: ${new Date(item.endDate).toDateString()}`}
-      </Text>
-
-      <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-      </View>
-      <Text style={styles.progressText}>{progressPercent}% Progress</Text>
-
-      <Text style={styles.info}>
-        Each pays: {item.monthlyContribution} by {item.dueDay}th of month
-      </Text>
 
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={styles.editBtn}
-          onPress={() => {
+          onPress={(e) => {
+            e.stopPropagation(); // Prevent parent touch
             Alert.alert('Edit feature coming soon!');
           }}
         >
           <Text style={styles.btnText}>Edit Vault</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.deleteBtn}
-          onPress={() => deleteVault(item.id)}
+          onPress={(e) => {
+            e.stopPropagation();
+            deleteVault(item.id);
+          }}
         >
           <Text style={styles.btnText}>Delete</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editBtn}
+          onPress={(e) => {
+            e.stopPropagation();
+            navigation.navigate('SubVault', {
+              vaultId: item.id,
+              members: item.members,
+            });
+          }}
+        >
+          <Text style={styles.btnText}>Sub-Vault</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
+
 
 
   return (
